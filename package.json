@@ -1,0 +1,23 @@
+{
+  "name": "file_manager",
+  "version": "1.0.0",
+  "description": "Assignment File Manager",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexeikravchuk/file_manager.git"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "Alexei Kravchuk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexeikravchuk/file_manager/issues"
+  },
+  "homepage": "https://github.com/alexeikravchuk/file_manager#readme"
+}
