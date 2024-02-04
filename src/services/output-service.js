@@ -1,5 +1,6 @@
 import { EOL } from 'node:os';
 import { stdout } from 'node:process';
+import { generateLsTable } from '../utils/generateLsTable.js';
 import { getStyledText } from '../utils/getStyledText.js';
 import readline from './readline.js';
 
@@ -13,6 +14,7 @@ class OutputService {
 		readline.on('close', () => {
 			const { username } = this.#state.getValue('args');
 			stdout.write(EOL + `Thank you for using File Manager, ${username}, goodbye!`);
+			process.exit(0);
 		});
 	}
 
@@ -25,6 +27,19 @@ class OutputService {
 
 	write(text) {
 		stdout.write(text);
+	}
+
+	writeFilesTable(dirents) {
+		try {
+
+			const table = generateLsTable(dirents);
+			this.write(table);
+
+		} catch (e) {
+			console.log(e);
+		}
+
+
 	}
 
 	writeError(text) {

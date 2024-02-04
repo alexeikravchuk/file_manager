@@ -5,11 +5,11 @@ import outputHandler from './services/output-service.js';
 
 export default class App {
 	#state;
-	navigator;
+	#navigator;
 
 	constructor(state) {
 		this.#state = state;
-		this.navigator = new Navigator(state);
+		this.#navigator = new Navigator(state);
 		this.input = inputHandler;
 		this.output = outputHandler;
 
@@ -34,7 +34,27 @@ export default class App {
 	}
 
 	#defineOperations() {
-		inputHandler.setOperation('up', this.navigator.navigateUp.bind(this));
+		const navigator = this.#navigator;
+
+		const operations = {
+			up: navigator.navigateUp.bind(navigator),
+			cd: navigator.changeDir.bind(navigator),
+			ls: navigator.listDir.bind(navigator, this.output),
+		};
+
+		const wrapHandler = (handler) => {
+			return (args) => {
+				return Promise.resolve(handler(...args)).catch(e => {
+					this.output.writeError('Operation failed');
+				}).finally(() => {
+					this.output.printCurrentDir();
+				});
+			};
+		};
+
+		Object.entries(operations).forEach(([command, handler]) => {
+			this.input.setOperation(command, wrapHandler(handler));
+		});
 	}
 
 	#parseArgs(args) {

@@ -1,4 +1,6 @@
 import { homedir } from 'node:os';
+import { resolve } from 'node:path';
+import { readdir, access } from 'node:fs/promises';
 
 export class Navigator {
 	#state;
@@ -15,9 +17,25 @@ export class Navigator {
 	}
 
 	navigateUp() {
-		const currentDir = this.#state.getValue('currentDir');
-		const parentDir = currentDir.split('/').slice(0, -1).join('/');
+		return this.changeDir('..');
+	}
 
-		this.#state.setValue('currentDir', parentDir);
+	async changeDir(path) {
+		const currentDir = this.#state.getValue('currentDir');
+		const newDir = resolve(currentDir, path);
+
+		try {
+			await access(newDir);
+			this.#state.setValue('currentDir', newDir);
+			return newDir;
+		} catch {
+			throw new Error('Directory does not exist');
+		}
+	}
+
+	async listDir(output) {
+		const currentDir = this.#state.getValue('currentDir');
+		const dirents = await readdir(currentDir, { withFileTypes: true });
+		output.writeFilesTable(dirents);
 	}
 }
