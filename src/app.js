@@ -1,5 +1,6 @@
 import inputHandler from './handlers/input-handler.js';
 
+
 export default class App {
 	#state;
 	inputHandler;

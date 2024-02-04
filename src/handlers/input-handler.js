@@ -2,9 +2,11 @@ import * as readline from 'node:readline/promises';
 import { EOL, homedir } from 'node:os';
 import { stdin as input, stdout as output, argv } from 'node:process';
 import state from '../state.js';
+import { getStyledText } from '../utils/getStyledText.js';
 
 class InputHandler {
 	#rl;
+	#handlersMap = new Map();
 
 	constructor() {
 		this.init();
@@ -50,17 +52,35 @@ class InputHandler {
 		return result;
 	}
 
+	setHandler(command, handler) {
+		this.#handlersMap.set(command, handler);
+	}
+
+	deleteHandler(command) {
+		this.#handlersMap.delete(command);
+	}
+
 	onMessage(message) {
-		if (message === '.exit') {
+		const [command, ...args] = message.split(' ');
+
+		if (command === '.exit') {
 			return this.#rl.close();
 		}
 
+		const handler = this.#handlersMap.get(command);
+		if (handler) {
+			handler(args);
+		} else {
+			const text = getStyledText('Invalid input', 'red');
+			output.write(text + EOL);
+		}
+
 		this.#writeCurrentDir();
-		console.log(message);
 	}
 
 	#writeCurrentDir() {
 		const currentDir = state.getValue('currentDir');
+
 		this.#rl.setPrompt(`You are currently in ${currentDir}> `);
 		this.#rl.prompt();
 	}
