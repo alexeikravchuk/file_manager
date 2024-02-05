@@ -14,9 +14,9 @@ export default class OsInfo {
 		return {
 			'--EOL': '',
 			'--cpus': this.#getCpusInfo(),
-			'--homedir': homedir(),
-			'--username': userInfo().username,
-			'--architecture': arch(),
+			'--homedir': getStyledText(homedir(), 'cyan'),
+			'--username': getStyledText(userInfo().username, 'cyan'),
+			'--architecture': getStyledText(arch(), 'cyan'),
 		};
 	}
 
