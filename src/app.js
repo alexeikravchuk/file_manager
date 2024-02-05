@@ -2,6 +2,7 @@ import { argv } from 'node:process';
 import Navigator from './operations/navigator.js';
 import FileEditor from './operations/file-editor.js';
 import OsInfo from './operations/os-info.js';
+import Hash from './operations/hash.js';
 import inputHandler from './services/input-service.js';
 import outputHandler from './services/output-service.js';
 
@@ -10,12 +11,16 @@ export default class App {
 	#navigator;
 	#fileEditor;
 	#osInfo;
+	#hash;
 
 	constructor(state) {
 		this.#state = state;
 		this.#navigator = new Navigator(state);
 		this.#fileEditor = new FileEditor(state);
 		this.#osInfo = new OsInfo();
+		this.#hash = new Hash(state);
+
+
 		this.input = inputHandler;
 		this.output = outputHandler;
 
@@ -47,6 +52,7 @@ export default class App {
 		const navigator = this.#navigator;
 		const fileEditor = this.#fileEditor;
 		const os = this.#osInfo;
+		const hash = this.#hash;
 
 		const operations = {
 			up: navigator.navigateUp.bind(navigator),
@@ -59,6 +65,7 @@ export default class App {
 			mv: fileEditor.move.bind(fileEditor),
 			rm: fileEditor.delete.bind(fileEditor),
 			os: os.getOsInfo.bind(os, this.output),
+			hash: hash.getHash.bind(hash, this.output),
 		};
 
 		const wrapHandler = (handler) => {
