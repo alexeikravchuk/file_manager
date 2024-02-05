@@ -36,6 +36,7 @@ export default class Navigator {
 	async listDir(output) {
 		const currentDir = this.#state.getValue('currentDir');
 		const dirents = await readdir(currentDir, { withFileTypes: true });
-		output.writeFilesTable(dirents);
+		await output.writeFilesTable(dirents);
+		return dirents;
 	}
 }

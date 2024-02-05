@@ -12,7 +12,7 @@ class InputService {
 
 		readline.on('line', (line) => {
 			if (line) {
-				this.onMessage(line.trim());
+				return this.onMessage(line.trim());
 			}
 
 			this.#errorCb('');

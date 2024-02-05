@@ -35,7 +35,7 @@ class OutputService {
 	async writeFilesTable(dirents) {
 		try {
 			const table = generateLsTable(dirents);
-			await this.write(table);
+			await console.log(table);
 		} catch (e) {
 			console.log(e);
 		}
@@ -45,7 +45,7 @@ class OutputService {
 		if (!text) {
 			return;
 		}
-		
+
 		const line = getStyledText(text, 'red', this.write);
 		await this.write(line + EOL);
 	}

@@ -36,8 +36,9 @@ export default class App {
 
 		output.printCurrentDir();
 
-		const inputErrorCb = (message) => {
-			output.writeError(message).then(() => output.printCurrentDir());
+		const inputErrorCb = async (message) => {
+			await output.writeError(message);
+			await output.printCurrentDir();
 		};
 		input.init({ state, errorCb: inputErrorCb });
 	}
