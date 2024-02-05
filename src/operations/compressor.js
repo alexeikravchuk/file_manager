@@ -51,7 +51,6 @@ export default class Compressor {
 			await pipeline(readStream, brotliStream, writeStream);
 			return outputFilePath;
 		} catch (e) {
-			console.log(e);
 			return Promise.reject(e.message);
 		}
 	}
