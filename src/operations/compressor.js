@@ -1,4 +1,5 @@
 import { createReadStream, createWriteStream } from 'node:fs';
+import { access } from 'node:fs/promises';
 import { createBrotliCompress, createBrotliDecompress, constants as ZLIB_CONSTANTS } from 'node:zlib';
 import { resolve } from 'node:path';
 import { pipeline } from 'node:stream/promises';
@@ -28,13 +29,10 @@ export default class Compressor {
 		return this.#runBrotliPipeline(filePath, destinationPath, false);
 	}
 
-	#runBrotliPipeline(filePath, destinationPath, isCompressing = true) {
+	async #runBrotliPipeline(filePath, destinationPath, isCompressing = true) {
 		const currentDir = this.#state.getValue('currentDir');
 		const inputFilePath = resolve(currentDir, filePath);
 		const outputFilePath = resolve(currentDir, destinationPath);
-
-		const readStream = createReadStream(inputFilePath);
-		const writeStream = createWriteStream(outputFilePath, { flags: 'wx' });
 
 		const options = {
 			flush: ZLIB_CONSTANTS.BROTLI_OPERATION_PROCESS,
@@ -43,8 +41,18 @@ export default class Compressor {
 			},
 		};
 
-		const brotliStream = isCompressing ? createBrotliCompress(options) : createBrotliDecompress(options);
+		try {
+			await access(inputFilePath);
 
-		return pipeline(readStream, brotliStream, writeStream);
+			const readStream = createReadStream(inputFilePath);
+			const writeStream = createWriteStream(outputFilePath, { flags: 'wx' });
+			const brotliStream = isCompressing ? createBrotliCompress(options) : createBrotliDecompress(options);
+
+			await pipeline(readStream, brotliStream, writeStream);
+			return outputFilePath;
+		} catch (e) {
+			console.log(e);
+			return Promise.reject(e.message);
+		}
 	}
 }
