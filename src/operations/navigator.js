@@ -2,7 +2,7 @@ import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { readdir, access } from 'node:fs/promises';
 
-export class Navigator {
+export default class Navigator {
 	#state;
 
 	constructor(state) {

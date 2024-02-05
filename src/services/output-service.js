@@ -10,6 +10,7 @@ class OutputService {
 	init(params) {
 		const { state } = params;
 		this.#state = state;
+		this.writeStream = stdout;
 
 		readline.on('close', () => {
 			const { username } = this.#state.getValue('args');
@@ -26,20 +27,18 @@ class OutputService {
 	}
 
 	write(text) {
-		stdout.write(text);
+		return new Promise((resolve) => {
+			stdout.write(text, resolve);
+		});
 	}
 
 	writeFilesTable(dirents) {
 		try {
-
 			const table = generateLsTable(dirents);
 			this.write(table);
-
 		} catch (e) {
 			console.log(e);
 		}
-
-
 	}
 
 	writeError(text) {

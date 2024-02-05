@@ -1,15 +1,18 @@
 import { argv } from 'node:process';
-import { Navigator } from './operations/navigator.js';
+import Navigator from './operations/navigator.js';
+import FileEditor from './operations/file-editor.js';
 import inputHandler from './services/input-service.js';
 import outputHandler from './services/output-service.js';
 
 export default class App {
 	#state;
 	#navigator;
+	#fileEditor;
 
 	constructor(state) {
 		this.#state = state;
 		this.#navigator = new Navigator(state);
+		this.#fileEditor = new FileEditor(state);
 		this.input = inputHandler;
 		this.output = outputHandler;
 
@@ -35,11 +38,13 @@ export default class App {
 
 	#defineOperations() {
 		const navigator = this.#navigator;
+		const fileEditor = this.#fileEditor;
 
 		const operations = {
 			up: navigator.navigateUp.bind(navigator),
 			cd: navigator.changeDir.bind(navigator),
 			ls: navigator.listDir.bind(navigator, this.output),
+			cat: fileEditor.read.bind(fileEditor, this.output),
 		};
 
 		const wrapHandler = (handler) => {

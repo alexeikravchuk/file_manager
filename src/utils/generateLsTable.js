@@ -28,7 +28,7 @@ export const generateLsTable = (dirents) => {
 		const name = dirent.name;
 		const type = dirent.isDirectory() ? DIRECTORY : dirent.isSymbolicLink() ? SYMLINK : FILE;
 
-		table += getRow(index, name, type);
+		table += getRow(index, name, type, true);
 	});
 
 	return table + BOTTOM_LINE;
@@ -38,11 +38,11 @@ const TOP_LINE = `${'┌'}${'─'.repeat(INDEX_LENGTH)}${'┬'}${'─'.repeat(NA
 const MID_LINE = `${'├'}${'─'.repeat(INDEX_LENGTH)}${'┼'}${'─'.repeat(NAME_LENGTH)}${'┼'}${'─'.repeat(TYPE_LENGTH)}${'┤'}${EOL}`;
 const BOTTOM_LINE = `${'└'}${'─'.repeat(INDEX_LENGTH)}${'┴'}${'─'.repeat(NAME_LENGTH)}${'┴'}${'─'.repeat(TYPE_LENGTH)}${'┘'}${EOL}`;
 
-const getRow = (index, name, type) => {
+const getRow = (index, name, type, styled=false) => {
 	const nameTruncated = name.length > NAME_LENGTH ? name.slice(0, NAME_LENGTH - 3) + '...' : name;
 
 	const indexSpace = (INDEX_LENGTH - index.toString().length) * 0.5 >> 0;
-	const nameSpace = (NAME_LENGTH - nameTruncated.length) * 0.5 >> 0;
+	const nameSpace = (NAME_LENGTH  - nameTruncated.length) * 0.5 >> 0;
 	const typeSpace = (TYPE_LENGTH - type.length) * 0.5 >> 0;
 
 	let indexText = `${' '.repeat(indexSpace)}${index}${' '.repeat(indexSpace)}`;
