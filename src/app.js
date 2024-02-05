@@ -45,6 +45,7 @@ export default class App {
 			cd: navigator.changeDir.bind(navigator),
 			ls: navigator.listDir.bind(navigator, this.output),
 			cat: fileEditor.read.bind(fileEditor, this.output),
+			add: fileEditor.add.bind(fileEditor),
 		};
 
 		const wrapHandler = (handler) => {

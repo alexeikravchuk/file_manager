@@ -1,6 +1,6 @@
-import { EOL } from 'node:os';
 import { resolve } from 'node:path';
 import { createReadStream } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { pipeline } from 'node:stream';
 import Accumulator from '../utils/Accumulator.js';
 
@@ -39,5 +39,12 @@ export default class FileEditor {
 				reject();
 			}
 		});
+	}
+
+	async add(fileName, content = '') {
+		const currentDir = this.#state.getValue('currentDir');
+		const filePath = resolve(currentDir, fileName);
+
+		await writeFile(filePath, content);
 	}
 }
