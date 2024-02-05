@@ -1,4 +1,5 @@
 import { EOL } from 'node:os';
+import { getStyledText } from './getStyledText.js';
 
 const INDEX = '(index)';
 const NAME = 'Name';
@@ -36,13 +37,13 @@ export const generateLsTable = (dirents) => {
 
 const TOP_LINE = `${'┌'}${'─'.repeat(INDEX_LENGTH)}${'┬'}${'─'.repeat(NAME_LENGTH)}${'┬'}${'─'.repeat(TYPE_LENGTH)}${'┐'}${EOL}`;
 const MID_LINE = `${'├'}${'─'.repeat(INDEX_LENGTH)}${'┼'}${'─'.repeat(NAME_LENGTH)}${'┼'}${'─'.repeat(TYPE_LENGTH)}${'┤'}${EOL}`;
-const BOTTOM_LINE = `${'└'}${'─'.repeat(INDEX_LENGTH)}${'┴'}${'─'.repeat(NAME_LENGTH)}${'┴'}${'─'.repeat(TYPE_LENGTH)}${'┘'}${EOL}`;
+const BOTTOM_LINE = `${'└'}${'─'.repeat(INDEX_LENGTH)}${'┴'}${'─'.repeat(NAME_LENGTH)}${'┴'}${'─'.repeat(TYPE_LENGTH)}${'┘'}`;
 
-const getRow = (index, name, type, styled=false) => {
+const getRow = (index, name, type, styled = false) => {
 	const nameTruncated = name.length > NAME_LENGTH ? name.slice(0, NAME_LENGTH - 3) + '...' : name;
 
 	const indexSpace = (INDEX_LENGTH - index.toString().length) * 0.5 >> 0;
-	const nameSpace = (NAME_LENGTH  - nameTruncated.length) * 0.5 >> 0;
+	const nameSpace = (NAME_LENGTH - nameTruncated.length) * 0.5 >> 0;
 	const typeSpace = (TYPE_LENGTH - type.length) * 0.5 >> 0;
 
 	let indexText = `${' '.repeat(indexSpace)}${index}${' '.repeat(indexSpace)}`;
@@ -57,6 +58,11 @@ const getRow = (index, name, type, styled=false) => {
 	}
 	if (typeText.length < TYPE_LENGTH) {
 		typeText += ' ';
+	}
+
+	if (styled) {
+		nameText = getStyledText(nameText, 'green');
+		typeText = getStyledText(typeText, 'green');
 	}
 
 	return `${'│'}${indexText}${'│'}${nameText}${'│'}${typeText}${'│'}${EOL}`;

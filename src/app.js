@@ -1,3 +1,4 @@
+import { EOL } from 'node:os';
 import { argv } from 'node:process';
 import Navigator from './operations/navigator.js';
 import FileEditor from './operations/file-editor.js';
@@ -6,6 +7,7 @@ import Hash from './operations/hash.js';
 import Compressor from './operations/compressor.js';
 import inputHandler from './services/input-service.js';
 import outputHandler from './services/output-service.js';
+import { getStyledText } from './utils/getStyledText.js';
 
 export default class App {
 	#state;
@@ -16,15 +18,16 @@ export default class App {
 	#compressor;
 
 	constructor(state) {
-		this.#state = state;
-		this.#navigator = new Navigator(state);
-		this.#fileEditor = new FileEditor(state);
-		this.#osInfo = new OsInfo();
-		this.#hash = new Hash(state);
-		this.#compressor = new Compressor(state);
-
 		this.input = inputHandler;
 		this.output = outputHandler;
+
+		this.#state = state;
+
+		this.#navigator = new Navigator(state, outputHandler);
+		this.#fileEditor = new FileEditor(state, outputHandler);
+		this.#osInfo = new OsInfo(outputHandler);
+		this.#hash = new Hash(state, outputHandler);
+		this.#compressor = new Compressor(state, outputHandler);
 
 		this.init();
 	}
@@ -38,7 +41,8 @@ export default class App {
 
 		this.#defineOperations();
 
-		output.write(`Welcome to the File Manager, ${args.username}!\n`);
+		const welcomeMessage = getStyledText(`Welcome to the File Manager, ${args.username}!`, 'bold');
+		output.write(welcomeMessage + EOL);
 		output.init({ state });
 
 		output.printCurrentDir();
@@ -60,15 +64,15 @@ export default class App {
 		const operations = {
 			up: navigator.navigateUp.bind(navigator),
 			cd: navigator.changeDir.bind(navigator),
-			ls: navigator.listDir.bind(navigator, this.output),
-			cat: fileEditor.read.bind(fileEditor, this.output),
+			ls: navigator.listDir.bind(navigator),
+			cat: fileEditor.read.bind(fileEditor),
 			add: fileEditor.add.bind(fileEditor),
 			rn: fileEditor.rename.bind(fileEditor),
 			cp: fileEditor.copy.bind(fileEditor),
 			mv: fileEditor.move.bind(fileEditor),
 			rm: fileEditor.delete.bind(fileEditor),
-			os: os.getOsInfo.bind(os, this.output),
-			hash: hash.getHash.bind(hash, this.output),
+			os: os.getOsInfo.bind(os),
+			hash: hash.getHash.bind(hash),
 			compress: compressor.compress.bind(compressor),
 			decompress: compressor.decompress.bind(compressor),
 		};

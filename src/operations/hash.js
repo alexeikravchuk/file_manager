@@ -2,33 +2,34 @@ import { createReadStream } from 'node:fs';
 import { EOL } from 'node:os';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
-import { pipeline } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
+
+import { getStyledText } from '../utils/getStyledText.js';
 
 export default class Hash {
 	#state;
+	#output;
 
-	constructor(state) {
+	constructor(state, output) {
 		this.#state = state;
+		this.#output = output;
 	}
 
-	async getHash(output, filePath) {
+	async getHash(filePath) {
 		const currentDir = this.#state.getValue('currentDir');
 		const fullPath = resolve(currentDir, filePath);
 
 		const stream = createReadStream(fullPath);
 		const hash = createHash('sha256');
 
-		return new Promise((res, rej) => {
-			pipeline(stream, hash, (err) => {
-				if (err) {
-					return rej(err);
-				}
+		try {
+			await pipeline(stream, hash);
 
-				const hexHash = hash.digest('hex');
-				process.stdout.write(hexHash + EOL);
-				res();
-			});
-		});
-
+			const hexHash = hash.digest('hex');
+			const hexHashStyled = getStyledText(hexHash, 'blue');
+			this.#output.write(hexHashStyled + EOL);
+		} catch {
+			return Promise.reject();
+		}
 	}
 }

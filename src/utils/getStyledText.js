@@ -8,12 +8,14 @@ const colors = {
 	white: '\x1b[37m',
 };
 
-const reset = '\x1b[0m';
-export const getStyledText = (text, color) => {
+const fontStyle = {
+	bold: '\x1b[1m',
+};
 
-	const colorCode = colors[color] || '';
+const reset = '\x1b[0m';
+export const getStyledText = (text, name) => {
+
+	const colorCode = colors[name] || fontStyle[name] || '';
 
 	return `${colorCode}${text}${reset}`;
 };
-
-// export const styledPartLength = (colors.red + reset).length;

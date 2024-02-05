@@ -1,12 +1,16 @@
-import { homedir } from 'node:os';
+import { EOL, homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { readdir, access } from 'node:fs/promises';
+import { generateLsTable } from '../utils/generateLsTable.js';
 
 export default class Navigator {
 	#state;
+	#output;
 
-	constructor(state) {
+	constructor(state, output) {
 		this.#state = state;
+		this.#output = output;
+
 		this.#init();
 	}
 
@@ -21,6 +25,10 @@ export default class Navigator {
 	}
 
 	async changeDir(path) {
+		if (!path) {
+			return this.#output.writeInvalidInput();
+		}
+
 		const currentDir = this.#state.getValue('currentDir');
 		const newDir = resolve(currentDir, path);
 
@@ -33,10 +41,11 @@ export default class Navigator {
 		}
 	}
 
-	async listDir(output) {
+	async listDir() {
 		const currentDir = this.#state.getValue('currentDir');
 		const dirents = await readdir(currentDir, { withFileTypes: true });
-		await output.writeFilesTable(dirents);
+		const table = generateLsTable(dirents);
+		await this.#output.write(table + EOL);
 		return dirents;
 	}
 }

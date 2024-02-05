@@ -3,14 +3,16 @@ import { getStyledText } from '../utils/getStyledText.js';
 
 export default class OsInfo {
 	#info;
+	#output;
 
-	constructor() {
+	constructor(output) {
+		this.#output = output;
 		this.init().then(info => this.#info = info);
 	}
 
 	async init() {
 		return {
-			'--EOL': EOL,
+			'--EOL': '',
 			'--cpus': this.#getCpusInfo(),
 			'--homedir': homedir(),
 			'--username': userInfo().username,
@@ -18,13 +20,16 @@ export default class OsInfo {
 		};
 	}
 
-	async getOsInfo(output, key) {
+	async getOsInfo(key) {
+		const output = this.#output;
+
 		const info = this.#info[key];
-		if (info) {
-			return console.log(info);
+
+		if (info !== undefined) {
+			return output.write(info + EOL);
 		}
 
-		await output.writeError('Invalid input');
+		return output.writeError('Invalid input');
 	}
 
 	#getCpusInfo() {

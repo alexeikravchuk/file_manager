@@ -14,15 +14,16 @@ class OutputService {
 
 		readline.on('close', () => {
 			const { username } = this.#state.getValue('args');
-			stdout.write(EOL + `Thank you for using File Manager, ${username}, goodbye!`);
+			const byeMessage = getStyledText(`Thank you for using File Manager, ${username}, goodbye!`, 'bold');
+			stdout.write(EOL + byeMessage);
 			process.exit(0);
 		});
 	}
 
 	printCurrentDir() {
 		const currentDir = this.#state.getValue('currentDir');
-
-		readline.setPrompt(`You are currently in ${currentDir}> `);
+		const styledMessage = getStyledText(`You are currently in ${currentDir}`, 'yellow');
+		readline.setPrompt(`${styledMessage}${EOL}> `);
 		readline.prompt();
 	}
 
@@ -32,15 +33,6 @@ class OutputService {
 		});
 	}
 
-	async writeFilesTable(dirents) {
-		try {
-			const table = generateLsTable(dirents);
-			await console.log(table);
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
 	async writeError(text) {
 		if (!text) {
 			return;
@@ -48,6 +40,10 @@ class OutputService {
 
 		const line = getStyledText(text, 'red', this.write);
 		await this.write(line + EOL);
+	}
+
+	writeInvalidInput() {
+		return this.writeError('Invalid input');
 	}
 }
 
