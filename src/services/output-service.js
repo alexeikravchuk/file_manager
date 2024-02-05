@@ -32,18 +32,22 @@ class OutputService {
 		});
 	}
 
-	writeFilesTable(dirents) {
+	async writeFilesTable(dirents) {
 		try {
 			const table = generateLsTable(dirents);
-			this.write(table);
+			await this.write(table);
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
-	writeError(text) {
+	async writeError(text) {
+		if (!text) {
+			return;
+		}
+		
 		const line = getStyledText(text, 'red', this.write);
-		this.write(line + EOL);
+		await this.write(line + EOL);
 	}
 }
 

@@ -1,6 +1,6 @@
-import { resolve } from 'node:path';
-import { createReadStream, createWriteStream } from 'node:fs';
-import { writeFile, rename } from 'node:fs/promises';
+import { resolve, basename } from 'node:path';
+import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { writeFile, rename, unlink, stat } from 'node:fs/promises';
 import { pipeline } from 'node:stream';
 import Accumulator from '../utils/Accumulator.js';
 
@@ -56,10 +56,12 @@ export default class FileEditor {
 		return rename(oldPath, newPath);
 	}
 
-	copy(fileName, newFileName) {
+	async copy(fileName, newDirPath) {
 		const currentDir = this.#state.getValue('currentDir');
 		const filePath = resolve(currentDir, fileName);
-		const newFilePath = resolve(currentDir, newFileName);
+		const fileNameWithoutPath = basename(fileName);
+
+		const newFilePath = resolve(currentDir, newDirPath, fileNameWithoutPath);
 
 		return new Promise((resolve, reject) => {
 			try {
@@ -71,7 +73,7 @@ export default class FileEditor {
 					writeStream,
 					(err) => {
 						if (err) {
-							reject();
+							reject(err.message);
 						} else {
 							resolve();
 						}
@@ -81,5 +83,17 @@ export default class FileEditor {
 				reject();
 			}
 		});
+	}
+
+	async move(fileName, newDirPath) {
+		await this.copy(fileName, newDirPath);
+		return this.delete(fileName);
+	}
+
+	delete(fileName) {
+		const currentDir = this.#state.getValue('currentDir');
+		const filePath = resolve(currentDir, fileName);
+
+		return unlink(filePath);
 	}
 }

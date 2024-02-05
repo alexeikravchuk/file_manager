@@ -14,6 +14,8 @@ class InputService {
 			if (line) {
 				this.onMessage(line.trim());
 			}
+
+			this.#errorCb('');
 		});
 	}
 

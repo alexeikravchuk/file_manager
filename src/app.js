@@ -1,6 +1,7 @@
 import { argv } from 'node:process';
 import Navigator from './operations/navigator.js';
 import FileEditor from './operations/file-editor.js';
+import OsInfo from './operations/os-info.js';
 import inputHandler from './services/input-service.js';
 import outputHandler from './services/output-service.js';
 
@@ -8,11 +9,13 @@ export default class App {
 	#state;
 	#navigator;
 	#fileEditor;
+	#osInfo;
 
 	constructor(state) {
 		this.#state = state;
 		this.#navigator = new Navigator(state);
 		this.#fileEditor = new FileEditor(state);
+		this.#osInfo = new OsInfo();
 		this.input = inputHandler;
 		this.output = outputHandler;
 
@@ -33,12 +36,16 @@ export default class App {
 
 		output.printCurrentDir();
 
-		input.init({ state, errorCb: output.writeError.bind(output) });
+		const inputErrorCb = (message) => {
+			output.writeError(message).then(() => output.printCurrentDir());
+		};
+		input.init({ state, errorCb: inputErrorCb });
 	}
 
 	#defineOperations() {
 		const navigator = this.#navigator;
 		const fileEditor = this.#fileEditor;
+		const os = this.#osInfo;
 
 		const operations = {
 			up: navigator.navigateUp.bind(navigator),
@@ -48,6 +55,9 @@ export default class App {
 			add: fileEditor.add.bind(fileEditor),
 			rn: fileEditor.rename.bind(fileEditor),
 			cp: fileEditor.copy.bind(fileEditor),
+			mv: fileEditor.move.bind(fileEditor),
+			rm: fileEditor.delete.bind(fileEditor),
+			os: os.getOsInfo.bind(os, this.output),
 		};
 
 		const wrapHandler = (handler) => {
