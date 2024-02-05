@@ -37,11 +37,27 @@ class InputService {
 		const handler = this.#operationsMap.get(command);
 
 		if (handler) {
-			handler(args);
+			const mergedArgs = this.#checkStringsOnArgs(args);
+			handler(mergedArgs);
 		} else {
 			const text = 'Invalid input';
 			this.#errorCb(text);
 		}
+	}
+
+	#checkStringsOnArgs(args) {
+		const regex = /"([^"]+)"|'([^']+)'|(\S+)/g;
+		let match;
+		const paths = [];
+
+		let line = args.join(' ');
+
+		while ((match = regex.exec(line)) !== null) {
+			const path = match[1] || match[2] || match[3];
+			paths.push(path);
+		}
+
+		return paths;
 	}
 }
 

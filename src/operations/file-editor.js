@@ -1,5 +1,5 @@
 import { EOL } from 'node:os';
-import { resolve, basename } from 'node:path';
+import { resolve, basename, normalize } from 'node:path';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { writeFile, rename, unlink } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
@@ -67,8 +67,10 @@ export default class FileEditor {
 			return this.#output.writeInvalidInput();
 		}
 
+		console.log(fileName, newDirPath);
+
 		const currentDir = this.#state.getValue('currentDir');
-		const filePath = resolve(currentDir, fileName);
+		const filePath = resolve(currentDir, normalize(fileName));
 		const fileNameWithoutPath = basename(fileName);
 
 		const newFilePath = resolve(currentDir, newDirPath, fileNameWithoutPath);
@@ -80,6 +82,7 @@ export default class FileEditor {
 			await pipeline(fileStream, writeStream);
 			return true;
 		} catch (e) {
+			console.log(e.message);
 			return Promise.reject(e.message);
 		}
 	}
