@@ -3,6 +3,7 @@ import Navigator from './operations/navigator.js';
 import FileEditor from './operations/file-editor.js';
 import OsInfo from './operations/os-info.js';
 import Hash from './operations/hash.js';
+import Compressor from './operations/compressor.js';
 import inputHandler from './services/input-service.js';
 import outputHandler from './services/output-service.js';
 
@@ -12,6 +13,7 @@ export default class App {
 	#fileEditor;
 	#osInfo;
 	#hash;
+	#compressor;
 
 	constructor(state) {
 		this.#state = state;
@@ -19,7 +21,7 @@ export default class App {
 		this.#fileEditor = new FileEditor(state);
 		this.#osInfo = new OsInfo();
 		this.#hash = new Hash(state);
-
+		this.#compressor = new Compressor(state);
 
 		this.input = inputHandler;
 		this.output = outputHandler;
@@ -53,6 +55,7 @@ export default class App {
 		const fileEditor = this.#fileEditor;
 		const os = this.#osInfo;
 		const hash = this.#hash;
+		const compressor = this.#compressor;
 
 		const operations = {
 			up: navigator.navigateUp.bind(navigator),
@@ -66,6 +69,8 @@ export default class App {
 			rm: fileEditor.delete.bind(fileEditor),
 			os: os.getOsInfo.bind(os, this.output),
 			hash: hash.getHash.bind(hash, this.output),
+			compress: compressor.compress.bind(compressor),
+			decompress: compressor.decompress.bind(compressor),
 		};
 
 		const wrapHandler = (handler) => {
