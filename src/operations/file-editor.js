@@ -40,6 +40,10 @@ export default class FileEditor {
 	}
 
 	add(fileName, ...content) {
+		if (!fileName) {
+			return this.#output.writeInvalidInput();
+		}
+
 		const currentDir = this.#state.getValue('currentDir');
 		const filePath = resolve(currentDir, fileName);
 

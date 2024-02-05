@@ -12,7 +12,7 @@ export default class OsInfo {
 
 	async init() {
 		return {
-			'--EOL': '',
+			'--EOL': getStyledText(JSON.stringify(EOL), 'cyan'),
 			'--cpus': this.#getCpusInfo(),
 			'--homedir': getStyledText(homedir(), 'cyan'),
 			'--username': getStyledText(userInfo().username, 'cyan'),
