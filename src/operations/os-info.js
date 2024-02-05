@@ -1,4 +1,5 @@
-import { EOL, cpus, homedir } from 'node:os';
+import { cpus, EOL, homedir, userInfo, arch } from 'node:os';
+import { getStyledText } from '../utils/getStyledText.js';
 
 export default class OsInfo {
 	#info;
@@ -8,26 +9,33 @@ export default class OsInfo {
 	}
 
 	async init() {
-		const info = {
+		return {
 			'--EOL': EOL,
-			'--cpus': cpus(),
+			'--cpus': this.#getCpusInfo(),
 			'--homedir': homedir(),
-			'--username': '',
+			'--username': userInfo().username,
+			'--architecture': arch(),
 		};
-
-		return info;
 	}
 
 	async getOsInfo(output, key) {
 		const info = this.#info[key];
 		if (info) {
-			return output.write(info);
+			return console.log(info);
 		}
 
-		await output.writeError('Invalid key');
+		await output.writeError('Invalid input');
 	}
 
 	#getCpusInfo() {
-		return this.#info['--cpus'];
+
+		const info = cpus().map(cpu => {
+			const { model, speed } = cpu;
+			const modelStyled = getStyledText(`'${model.trim()}'`, 'cyan');
+			const speedStyled = getStyledText(`'${speed > 1000 ? speed * 0.001 : speed} GHz'`, 'yellow');
+			return `  { model: ${modelStyled}, speed: ${speedStyled} }`;
+		}).join(`,${EOL}`);
+
+		return `[${EOL}${info}${EOL}]`;
 	}
 }
