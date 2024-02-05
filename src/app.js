@@ -47,6 +47,7 @@ export default class App {
 			cat: fileEditor.read.bind(fileEditor, this.output),
 			add: fileEditor.add.bind(fileEditor),
 			rn: fileEditor.rename.bind(fileEditor),
+			cp: fileEditor.copy.bind(fileEditor),
 		};
 
 		const wrapHandler = (handler) => {
